@@ -1,470 +1,138 @@
-# FOLD RUSH — Hackathon Execution Plan
+# STREET RUSH DUO — 2-Hour Hackathon Execution Plan
 
-## Mission
+**Platform:** iPhone Duo simulator using Bitrig, SwiftUI + SpriteKit  
+**Build window:** 120 minutes  
+**Goal:** A reliable, attractive 60-second playable demo showing a mechanic that benefits specifically from the unfolded Duo.  
+**Visual target:** Nostalgic, colorful, chunky early mobile-runner aesthetic. Original art, characters, sounds and branding only.
 
-Build one polished 20–30 second iPhone Duo experience in four hours:
+## Product pitch
 
-> **An endless runner where the runner moves automatically and the player physically reshapes the track with the Duo hinge.**
+**Street Rush Duo** is a bright, arcade-style endless runner where the unfolded iPhone becomes a window into **two simultaneous routes**. One runner auto-moves down an active three-lane street. The other half previews a synchronized alternate route, including obstacles and bonus coins. Press **ROUTE SWAP** to jump between them while maintaining momentum. The fold is not merely extra screen space: it makes the other route continuously visible and turns route planning into the central skill.
 
-The primary success condition is not “we built a game.”
+**One-sentence demo line:** “A runner where the other road is always in sight—and folding the phone changes the way you play.”
 
-It is:
+## Locked scope: P0 must ship
 
-> **A judge sees the physical fold change the level and immediately wants to try it.**
+1. Native iOS application launching in the iPhone Duo simulator.
+2. Attractive main menu: illustrated street backdrop, cheerful original skater, big **PLAY** button.
+3. Playable auto-scrolling runner: **three lanes, swipe left/right, jump, slide**, obstacle collisions, coins, increasing score, retry.
+4. Unfolded layout: **two side-by-side route views** with the **same simulation clock and shared score**. One route active, one route preview. Large **SWAP ROUTE** button; switching changes the active route without resetting progress.
+5. The active route has a clear outline/marker; the preview route has reduced HUD clutter and still visibly scrolls.
+6. At least one scripted demo moment: barrier on active route, clear/coin-rich alternative route, swap, collect coins, celebrate.
+7. Folded/compact state: one active full-size route, alternate route accessible via a route toggle or compact preview.
+8. Functional pause, game over and retry; simulator tested.
 
----
+**P1 only if P0 is done:** polished coin particles, one extra backdrop, bounce animations, a simple hinge-triggered pause, best score via UserDefaults, sound with mute.  
+**Do not build:** character shop, multiple levels, login, leaderboards, AI, multiplayer, complex 3D models, procedural world generator, real purchases, elaborate mission system. Make every displayed button work or omit it.
 
-## 0. Before the Official Coding Window
+## Paste this exact prompt into Bitrig
 
-Allowed preparation only:
+> Build **Street Rush Duo**, a native iPhone Duo game in SwiftUI and SpriteKit. It's a colorful nostalgic endless runner inspired by the friendly, chunky, graffiti-covered visual language of classic mobile games, but with fully original character/art/branding. Use sunny blue skies, warm orange city buildings, teal railings, yellow collectible coins, bold white outlined text and large yellow/blue rounded buttons. No cyberpunk, neon-glass UI or asset copying.
+>
+> On the unfolded inner display, create two side-by-side gameplay panels separated visually at the fold. **Left = Main Street**, **Right = Bonus Alley**. They are synchronized three-lane forward-scrolling perspectives driven by **one shared game state**. The runner is visible and controllable in only one active route at a time; the other side shows an animated preview of upcoming obstacles and coins. Put a prominent **SWAP ROUTE** button near the bottom of the inactive route or in an easily accessible safe zone away from the hinge. A route swap seamlessly transfers the runner to the corresponding lane of the other route while preserving distance, coin total, jump state where feasible and score. Briefly animate the transition. Players must be able to look ahead at the second screen to plan the swap.
+>
+ Gameplay: start from a working PLAY button, auto-forward movement, 3 lanes, swipe left/right to change lanes, swipe up to jump, swipe down to slide, stationary-pattern obstacles moving toward the runner, coin pickup, collision detection, pause, game-over summary with score/coins/distance and RETRY. Include a scripted opening 20 seconds so the demo shows a roadblock on one screen while the alternate screen offers a coin trail. Continue into a looping obstacle sequence. Prioritize reliable responsiveness over complex art. Use SwiftUI for menus/HUD and SpriteKit for the running views; prefer simple original programmatically generated sprites and perspective scaling over an unfinishable 3D scene.
+>
+ For the folded state, show one full-size playable route and an obvious route-switch control. Detect Duo geometry/hinge using APIs confirmed available in the project; if hinge APIs are unavailable, respond to window size/orientation without inventing API names. Layout must not place crucial information under the hinge. Maintain game state while unfolding/refolding, if the simulator supports the transition. Start by generating the minimal compiling project and running it in the iPhone Duo simulator. Build in discrete milestones, compile after each one and fix build/runtime issues before adding the next feature. Do not implement nonessential menus until the core runner and route swap work. A stable polished 60-second demo is the goal.
 
-- keep these planning docs ready;
-- prepare original visual assets if permitted by event rules;
-- prepare original sound assets if permitted;
-- confirm Xcode 27.1 beta and Duo simulator are installed;
-- confirm Bitrig is signed in and ready;
-- decide team roles;
-- rehearse the pitch conceptually.
+## UI/UX spec
 
-Do **not** create implementation code before the official start.
+| Screen | Left half | Right half | Important details |
+|---|---|---|---|
+| Start, unfolded | Full-height smiling skater illustration, animated city, oversized yellow PLAY | Small logo, simple blue HOW TO PLAY and optional SOUND buttons, sample alternate road | Keep Play immediately discoverable. |
+| Run, unfolded | Main Street runner, score/coins, moving lane obstacles | Bonus Alley preview, extra coins, bold SWAP ROUTE control | Active-route pill/colored border; both roads scroll together. After swap, the right becomes active and left becomes preview. |
+| Run, folded | Single active road | — | Compact top score and bottom route toggle; maintain playability. |
+| Pause | Frozen game | Frozen game + resume/restart overlay | Preserve current run. |
+| Game over | Freeze the last game scene, cheerful character reaction | Score, coins, distance, prominent RETRY button | RETRY resets both routes and shared data. |
 
----
+**Palette:** Sky `#61C9F8`; sunny yellow `#FFC940`; coral `#FF784B`; grass/green `#70CB53`; royal blue `#2577CB`; warm cream `#FFF3D6`; ink `#20324A`.  
+**Art direction:** Original cartoon skater with cap and backpack; painted sidewalks, rounded trams or street barriers, comic-style bursts, stickers, spray-paint shapes and clouds. Aim for bright depth and legible silhouettes—not a visual replica of Subway Surfers.  
+**Typography:** Bold rounded system font plus dark stroke/shadow on big score and headers. Touch targets at least ~44 pt.  
+**Interaction:** Native gestures in the *active* route only. Dedicated route swap button kept well away from the hinge. Distinct 150–250 ms lane/swap animations. Clear collision feedback, coin pop and subtle screen shake. Respect reduced motion if inexpensive.
 
-# PHASE 1 — PROVE THE DUO MECHANIC
+## Technical architecture (small and testable)
 
-## 11:30–11:40 — Project creation
+- `StreetRushDuoApp.swift`: app entry.
+- `GameContainerView.swift`: adaptive unfolded/folded SwiftUI layout and menu/pause/results presentation.
+- `GameStore.swift`: single `ObservableObject` / `@Observable` state for phase, active route, player lane, jump/slide cooldown, score, coins, distance, health (one-hit fail for MVP), pause.
+- `RunnerScene.swift`: SpriteKit pseudo-3D renderer, with reusable route configuration (`mainStreet` vs `bonusAlley`). Two scene views should read the **same game clock**, or one shared scheduler updates both route models. Avoid running two independent timers.
+- `TrackModel.swift`: seeded or scripted obstacle/coin sequence by route and elapsed time; simple collision rules.
+- `Assets.swift`: color palette, gradients, basic sprites/icons (generate inside code if assets unavailable).
 
-### Goal
+**Rendering shortcut:** Draw road as trapezoid with converging lane markers; render obstacles/coins based on normalized depth (0 far away, 1 near runner), increasing scale as they approach. Move obstacle positions toward the bottom at a fixed speed. Use only three X lane coordinates. This is sufficient to evoke a 3D runner without modeling a full 3D world.
 
-Get a clean native project running immediately.
+**Shared timing:** `GameStore` owns a single monotonic elapsed time / fixed-frame update. Main and bonus route entities are determined from the same `distance`, so route previews always stay synchronized. Route switching toggles only `activeRoute`, preserves `distance`, and ensures collisions are evaluated on the new active route. Add a short swap invulnerability window (~0.35–0.5 s) to prevent unfair instant collisions.
 
-### Actions
+**Controls:** L/R swipe = lane -1/+1, upward = jump for ~0.7 s, downward = slide ~0.7 s. Route swap is a button; do not overload swipe semantics. Add a brief tutorial overlay. Mouse testing: tap onscreen arrow/jump/slide controls as a fallback if simulator gestures are inconvenient; these can be hidden for final capture.
 
-- Create **FOLD RUSH** project in Bitrig.
-- Open/run in iPhone Duo simulator.
-- Confirm target uses iOS 27.1 SDK.
-- Establish simple SwiftUI root.
-- Add SpriteKit host/scene shell.
+**Device API rule:** Check the actual Bitrig project and installed SDK before referencing `onHingeChange` or any other hinge/arrangement API. The core game must work by reading available scene/window geometry even if a specialized API differs or is unavailable.
 
-### Exit condition
+## Detailed minute-by-minute schedule
 
-Blank game scene launches reliably in Duo simulator.
+| Time | Workstream | Owner suggestion | Exit condition |
+|---|---|---|---|
+| 0–10 min | Start Bitrig app, select iPhone Duo simulator, paste prompt; create skeleton | Builder | Clean build + main menu renders. |
+| 10–30 min | One playable main route: background, moving track, 3 lanes, swipe controls | Builder | Player can run and dodge in simulator. |
+| 30–45 min | Coins, two obstacle types, collision/game over/retry, score | Builder | Complete 30-second single-route loop. |
+| 45–65 min | Unfolded dual-route geometry, shared simulation state, distinct street/alley views | Builder | Both screens scroll in sync; one active. |
+| 65–80 min | Working SWAP ROUTE mechanic, preview/active styling, scripted showcase challenge | Builder | Swap solves a visible obstacle; no score reset. |
+| 80–95 min | Polished nostalgic UI, menu/results, clouds/stickers/button bounce | Designer + builder | Consistent original visual style. |
+| 95–108 min | Fold/unfold and orientation testing; fix clipping/hinge overlap | Tester + builder | Core loop still playable in both configurations. |
+| 108–120 min | Rehearse demo, screen-record backup, fix only blockers | Presenter + team | Smooth 45–60-second live walkthrough. |
 
-Do not add menus yet.
+**If only one teammate is coding:** Designer prepares exact colors/layout and screenshots while builder works in Bitrig; presenter handles the script and simulator QA. **Do not merge competing source edits during the final 15 minutes.**
 
----
+## Milestone-specific Bitrig follow-up prompts
 
-## 11:40–12:00 — Hinge proof
+**After first generation (core game):**
+> Stop adding cosmetic screens. Make PLAY launch a genuinely playable endless-runner loop. Verify lane changes, jump, slide, one obstacle, one coin, score and working RETRY directly in the simulator. Fix compilation/runtime errors before proceeding.
 
-### Goal
+**Once the runner works (Duo feature):**
+> Add synchronized Main Street and Bonus Alley to the unfolded Duo layout. Both panels must run from the same game clock. Only one route has a controllable runner; the other is an upcoming-obstacle preview. Implement SWAP ROUTE that preserves lane, distance and score, moves the runner between routes and visually marks which route is active. Add the scripted showcase: obstacle wall approaching on Main Street, clear coin trail on Bonus Alley. Ensure no important controls overlap the hinge.
 
-Prove live hinge data works before building gameplay.
+**Once route swap works (polish):**
+> Make the game feel like an original cheerful, nostalgic arcade runner: sunny sky, bright city storefronts, cartoon skater with backpack, chunky blue and yellow buttons, white outlined score, warm graffiti accents, satisfying coin pop and subtle bounce. Keep all buttons functional. Improve visuals without changing reliable gameplay logic.
 
-### Actions
+**Final QA:**
+> Use Bitrig's iPhone Duo simulator to test unfolded, folded and partially folded states. Verify PLAY, swipe controls, route swap, coins, collision, RETRY, pause and resuming a run. Fix all crashes, clipped HUD, hinge overlap and state resets. Do not add new features.
 
-- Wire `onHingeChange` at SwiftUI root.
-- Read/display/log current angle and hinge status.
-- Move the 3D Duo simulator through several folds.
-- Verify updates are continuous enough for gameplay.
-- Add a tiny hinge state store.
-- Query division reserved region if straightforward.
+## Acceptance checklist
 
-### Exit condition
-
-Moving the simulated hinge changes a visible debug value in real time.
-
-If not working by 12:00:
-
-- stop all game work;
-- isolate a minimal hinge test;
-- verify exact local SDK API signatures.
-
----
-
-## 12:00–12:20 — Minimal runner
-
-### Goal
-
-Get motion on screen with placeholder art.
-
-### Actions
-
-- Add simple runner node.
-- Add perspective rail/track placeholder.
-- Runner advances automatically.
-- Add fixed camera/world movement illusion.
-- No coins, no trains, no art polish.
-
-### Exit condition
-
-Runner appears to move forward continuously.
-
----
-
-## 12:20–12:30 — Broken-track prototype
-
-### Goal
-
-Prove the entire thesis in ugly form.
-
-### Actions
-
-- Place left/right track endpoints around crease.
-- Feed hinge angle into `FoldGeometryModel`.
-- Derive connection progress.
-- Visually move/animate the endpoint relationship.
-- When geometry is valid, connect track.
-- Allow runner to cross.
-
-### HARD CHECKPOINT — 12:30
-
-The team must be able to demonstrate:
-
-> **fold Duo -> track relationship changes -> track connects -> runner crosses**
-
-If this works, continue with FOLD RUSH.
-
-If it does not work, simplify aggressively for 15–20 minutes.
-
-Do not continue building generic game content while this is broken.
-
----
-
-# PHASE 2 — MAKE THE CORE FEEL GREAT
-
-## 12:30–1:00 — Track connection polish
-
-### Goal
-
-Turn the proof into the first judge-worthy moment.
-
-### Add
-
-- magnetic anticipation;
-- rail glow;
-- snap effect;
-- sparks;
-- metallic sound;
-- tiny camera impulse;
-- automatic runner continuation;
-- connection hysteresis so it does not flicker.
-
-### Exit condition
-
-The broken-track sequence is satisfying enough to demo alone.
-
----
-
-## 1:00–1:20 — Original visual pass
-
-### Person A
-
-Continue improving geometry reliability.
-
-### Person B
-
-Replace placeholders with original:
-
-- runner;
-- rail texture;
-- train/environment art;
-- coin/icon;
-- simple background layers.
-
-### Rule
-
-Do not copy Subway Surfers assets or branding.
-
-Aim for nostalgic endless-runner energy, not imitation.
-
----
-
-## 1:20–1:40 — Ramp sequence
-
-### Goal
-
-Create the second distinct use of fold geometry.
-
-### Actions
-
-- Add train obstacle.
-- Derive effective ramp pitch from hinge geometry.
-- Show ramp visually changing as the Duo folds.
-- Trigger a deterministic jump whose magnitude follows ramp pitch.
-- Add landing.
-
-### Exit condition
-
-Judge can visually understand:
-
-> **I created the ramp by changing the phone's shape.**
-
-Do not implement complex physics if scripted motion looks better.
-
----
-
-# PHASE 3 — BUILD THE SPECTACLE
-
-## 1:40–2:00 — Hinge grind
-
-### Goal
-
-Create the signature crease moment.
-
-### Actions
-
-- Anchor special rail to division region / crease.
-- Transition runner onto it.
-- Add sparks.
-- Add grind audio loop.
-- React effect intensity to fold geometry if cheap.
-- Exit back onto normal track.
-
-### Exit condition
-
-The hinge itself is visibly part of the level.
-
-If this causes instability, remove it and invest in gap/ramp polish instead.
-
----
-
-## 2:00–2:20 — Coins, score, fail/retry
-
-### Add only essentials
-
-- coin line / collection;
-- score or distance;
-- simple crash/fall state;
-- retry button;
-- reliable restart of scripted sequence.
-
-### Exit condition
-
-A judge can play/retry without developer intervention.
-
----
-
-## 2:20–2:40 — Start screen + tiny tutorial
-
-### Start screen
-
-- FOLD RUSH logo
-- original hero art
-- **PLAY**
-- tagline: **Bend the world. Keep running.**
-
-### Tutorial
-
-One line:
-
-> **BEND THE PHONE TO BEND THE TRACK**
-
-Auto-dismiss after first successful hinge interaction.
-
-Do not build settings, characters, shops, or missions.
-
----
-
-# PHASE 4 — POLISH TO WIN
-
-## 2:40–3:00 — Audio / particles / juice
-
-Prioritize in this order:
-
-1. rail snap sound;
-2. sparks;
-3. jump whoosh;
-4. landing impact;
-5. grind sound;
-6. coin sound;
-7. subtle music only if already available and original/licensed.
-
-Add haptics only if simulator/device workflow supports them without risk.
-
----
-
-## 3:00–3:10 — Visual cleanup
-
-Check:
-
-- no debug labels;
-- no clipping around hinge;
-- HUD does not cover crease;
-- consistent fonts;
-- original branding;
-- readable score;
-- clean start/retry loop;
-- no placeholder rectangles unless intentional.
-
----
-
-## 3:10–3:20 — Reliability pass
-
-Run the full sequence repeatedly.
-
-Test:
-
-- app cold launch;
-- Play;
-- first gap;
-- fold connection;
-- ramp;
-- grind;
-- finish/fail;
-- Retry;
-- repeat.
-
-Fix only high-impact failures.
-
-Do not refactor.
-
----
-
-## 3:20–3:30 — Freeze code and rehearse
-
-### No new mechanics
-
-Only fix catastrophic bugs.
-
-### Rehearse exact 20–30 second pitch
-
-Suggested script:
-
-> “We grew up playing endless runners by swiping characters around a flat world.”
-
-Start run.
-
-> “But iPhone Duo's world doesn't have to stay flat.”
-
-Fold -> rails connect.
-
-> “So instead of moving the player, we physically reshape the level.”
-
-Ramp / jump / grind.
-
-> **“The screen isn't showing the track. The screen is the track.”**
-
-Title.
-
-Optional final sentence:
-
-> “We built the entire experience in Bitrig using Duo's live hinge APIs.”
-
-Stop talking.
-
-Let judges react.
-
----
-
-# TWO-PERSON TASK SPLIT
-
-## Person A — Duo / gameplay owner
-
-Own:
-
-- project skeleton;
-- `onHingeChange`;
-- hinge state store;
-- division region;
-- fold geometry;
-- track connection;
-- runner/game state;
-- ramp behavior;
-- integration.
-
-## Person B — experience / polish owner
-
-Own:
-
-- original art/assets;
-- start/game-over UI;
-- particles;
-- audio;
-- coins;
-- HUD;
-- environment layers;
-- grind visuals;
-- demo/pitch polish.
-
-### Shared
-
-- test every milestone together;
-- integration every ~20–30 minutes;
-- both understand how to recover the demo if one person is talking to judges.
-
----
-
-# FALLBACK LADDER
-
-If time collapses, cut in this exact order.
-
-### Full target
-
-1. Broken track
-2. Ramp/train
-3. Hinge grind
-4. Coins/score
-5. Start/game over
-
-### If behind
-
-Drop hinge grind first.
-
-Keep:
-
-- broken track;
-- ramp;
-- retry.
-
-### If very behind
-
-Drop ramp.
-
-Build one immaculate interaction:
-
-> runner approaches impossible gap -> judge folds Duo -> rails snap together -> runner crosses -> title.
-
-A 10-second magical demo is better than a 30-second broken one.
-
----
-
-# DECISION RULES DURING THE HACK
-
-When deciding between two tasks, choose the one that improves one of these:
-
-1. Duo necessity
-2. immediate comprehension
-3. physical satisfaction
-4. reliability
-5. visual polish
-
-Do not optimize for feature count.
-
----
-
-# DEMO QUALITY CHECKLIST
-
-Before submission, answer YES to as many as possible:
-
-- Does the fold visibly change the level?
-- Is the runner mostly automatic rather than controlled by hinge-as-buttons?
-- Is the crease part of the gameplay?
-- Does the first “wow” happen within 10 seconds?
-- Is the project obviously an endless runner without explanation?
-- Are all assets original?
-- Does retry work?
-- Can the sequence run multiple times?
-- Is the project built primarily in Bitrig?
-- Can we explain the Duo API use in one sentence?
-- Can we demo without internet?
-- Can we recover quickly from a failed run?
-
----
-
-# FINAL PRIORITY
-
-If the game looks simple but the hinge interaction feels incredible, that is success.
-
-If the game looks feature-rich but the hinge feels like a gimmick, that is failure.
-
-**Protect the interaction.**
+- [ ] App builds and opens in the Duo simulator without crash.
+- [ ] Main menu's PLAY button launches a run.
+- [ ] Character auto-runs; at least left/right swipes work; jump/slide if time allows.
+- [ ] Coins update a visible counter and collision can end a run.
+- [ ] Two route views remain in sync when unfolded.
+- [ ] Route swap genuinely changes the active playable route, not just its color.
+- [ ] One scripted situation rewards a well-timed route swap.
+- [ ] Folded layout is usable; hinge hides no important action.
+- [ ] RETRY starts a clean fresh run on both routes.
+- [ ] Demo can be completed in 45–60 seconds without relying on fake screens.
+
+## Fallback ladder / scope cuts
+
+1. **If SpriteKit integration stalls by minute 30:** draw the runner and scrolling track using SwiftUI Canvas + a single timer. A functional 2.5D runner beats an unbuilt 3D one.
+2. **If independent previews lag by minute 65:** simplify the alternate road to a lightweight animated view generated from the same obstacle array; never fork game logic.
+3. **If gesture testing stalls:** use on-screen L/R/JUMP/SLIDE controls for the demo, retaining swipe as an enhancement.
+4. **If fold API stalls:** use adaptive width/layout based on available geometry and show the transition manually. Avoid claiming hinge behavior that isn't implemented.
+5. **If full visuals aren't ready:** preserve smooth road motion, bold UI and 2–3 memorable original assets. Skip character selection/shop/world map.
+6. **If 15 minutes remain and the app runs:** stop feature development, record a successful take and rehearse.
+
+## Demo script (50–60 seconds)
+
+**0–8s:** Open the app unfolded. “Classic runners let you see one road. Duo lets us see *two* at the same time.” Tap PLAY.  
+**8–23s:** Run and collect coins on Main Street. Point out that Bonus Alley has its own incoming coin trail and fewer obstacles.  
+**23–38s:** A barrier approaches on the left. “Because the other route is visible, I can plan ahead.” Tap SWAP ROUTE; runner shifts to the right and collects the bonus coins.  
+**38–47s:** Fold the device to the compact layout (only if confirmed working) and demonstrate continuity.  
+**47–60s:** Show game over and RETRY or one extra swap. “We turned the fold into a new gameplay decision, not just a bigger screen.”
+
+## Final deliverables
+
+- Live Bitrig iPhone Duo simulator project that plays from start to retry.
+- One short backup screen recording of the successful swap sequence.
+- A screenshot of the unfolded game with both routes visible.
+- This plan and a one-sentence pitch; **no requirement to produce an App Store-ready game**.
+
+## Reference / compatibility notes
+
+Bitrig's September 18, 2026 announcement says it can build native SwiftUI apps and test them in a folding 3D iPhone Duo simulator, including supported hinge callbacks. Confirm symbols in your installed SDK before depending on them: https://bitrig.com/blog/bitrig-builds-iphone-duo-apps. Event details emphasize newly possible Duo interactions and explicitly say a polished demo is sufficient: https://luma.com/yc-meetup-4378.
